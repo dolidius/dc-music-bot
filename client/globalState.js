@@ -32,9 +32,4 @@ export default class GlobalState {
     }
 
     removeCurrentUserFromQueue = (guildId) => this.queue.delete(guildId);
-
-    // addSongsToQueue = (guildId) => {
-
-    // }
-
 }
