@@ -11,7 +11,14 @@ export default class Play {
 
         if (ytdl.validateURL(song)) {
             //ytlink
-            const song_info = await ytdl.getInfo(song);
+            let song_info;
+            try {
+                song_info = await ytdl.getInfo(song);
+            } catch (e) {
+                message.channel.send("There was an error getting details about the song, retrying...");
+                this.execute(message, args);
+            }
+            
             songs.push({
                 title: song_info.videoDetails.title,
                 url: song_info.videoDetails.video_url,
@@ -19,7 +26,13 @@ export default class Play {
             })
         } else {
             //no link - keywords
-            const video = await this.findSongByKeywords(song);
+            let video;
+            try {
+                video = await this.findSongByKeywords(song);
+            } catch (e) {
+                message.channel.send("There was an error getting details about the song, retrying...");
+                this.execute(message, args);
+            }
             if (video) {
                 songs.push({
                     title: video.title,
