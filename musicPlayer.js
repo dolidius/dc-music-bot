@@ -30,7 +30,7 @@ export default class MusicPlayer {
 
         const manageQueue = (queue) => {
             if (queue.loopQueue && !queue.loop) {
-                song_queue.songs.push(song_queue.songs[0]);
+                queue.songs.push(queue.songs[0]);
             }
 
             if (!queue.loop) {

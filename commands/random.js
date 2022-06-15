@@ -9,7 +9,7 @@ export default class Random {
             return message.channel.send('🔁 Random order disabled');
         }
 
-        serverQueue.random = true;
+        queue.random = true;
         return message.channel.send('🔁 Random order enabled');
     }
 }

@@ -2,71 +2,111 @@ import ytdl from "ytdl-core";
 import GlobalState from "../client/globalState";
 import ytSearch from 'yt-search';
 import MusicPlayer from "../musicPlayer";
+import ytpl from 'ytpl';
 
 export default class Play {
     execute = async(message, args) => {
-        const song = args[0];
+        const song = args.join(" ");
         const state = new GlobalState();
         let songs = [];
 
+        let newSong;
         if (ytdl.validateURL(song)) {
-            //ytlink
-            let song_info;
-            try {
-                song_info = await ytdl.getInfo(song);
-            } catch (e) {
-                message.channel.send("There was an error getting details about the song, retrying...");
-                this.execute(message, args);
-            }
-            
-            songs.push({
-                title: song_info.videoDetails.title,
-                url: song_info.videoDetails.video_url,
-                provider: "youtube"
-            })
+            newSong = await this.getSongFromYTLink(message, song);
+        } else if (ytpl.validateID(song)){
+            newSong = await this.getPlaylistFromYTLink(message, song);
         } else {
-            //no link - keywords
-            let video;
-            try {
-                video = await this.findSongByKeywords(song);
-            } catch (e) {
-                message.channel.send("There was an error getting details about the song, retrying...");
-                this.execute(message, args);
-            }
-            if (video) {
-                songs.push({
-                    title: video.title,
-                    url: video.url,
-                    provider: "youtube"
-                })
-            } else {
-                message.channel.send("Error finding video.");
-                return
-            }
+            newSong = await this.getPlaylistFromYTKeywords(message, song);
         }
+
+        songs.push(...newSong);
 
         const guildId = message.guild.id;
 
         if (!state.getCurrentUserQueue(guildId)) {
-            const voiceChannel = message.member.voice.channel;
-            state.setCurrentUserQueue(guildId, voiceChannel, message.channel, songs)
-
-            try {
-                const connection = await voiceChannel.join();
-                state.setQueueConnection(guildId, connection);
-                await MusicPlayer.playSong(message.guild, state);
-            } catch (err) {
-                state.removeCurrentUserFromQueue(guildId);
-                message.channel.send("There was an error connecting!");
-                throw err;
-            }
+            await this.establishConnection(message, guildId, state, songs);
         } else {
-            const queue = state.getCurrentUserQueue(guildId);
-            queue.songs.push(...songs);
-            return message.channel.send(`👍 **${songs[0].title}** added to queue!`);
+            this.addSongsToQueue(message, guildId, state, songs)
         }
     }
 
+    addSongsToQueue = (message, guildId, state, songs) => {
+        const queue = state.getCurrentUserQueue(guildId);
+        queue.songs.push(...songs);
+        return message.channel.send(`👍 **${songs[0].title}** added to queue!`);
+    }
+
+    establishConnection = async (message, guildId, state, songs) => {
+        const voiceChannel = message.member.voice.channel;
+        state.setCurrentUserQueue(guildId, voiceChannel, message.channel, songs)
+
+        try {
+            const connection = await voiceChannel.join();
+            state.setQueueConnection(guildId, connection);
+            await MusicPlayer.playSong(message.guild, state);
+        } catch (err) {
+            state.removeCurrentUserFromQueue(guildId);
+            message.channel.send("There was an error connecting!");
+            throw err;
+        }
+    }
+
+    getSongFromYTLink = async (message, link) => {
+        let song_info;
+        try {
+            song_info = await ytdl.getInfo(link);
+        } catch (e) {
+            message.channel.send("There was an error getting details about the song, retrying...");
+            return false;
+        }
+            
+        return [{
+            title: song_info.videoDetails.title,
+            url: song_info.videoDetails.video_url,
+            provider: "youtube"
+        }];
+    }
+
+    getPlaylistFromYTLink = async (message, link) => {
+        let playlist;
+        try {
+            playlist = await ytpl(link);
+        } catch (e) {
+            message.channel.send("There was an error getting details about the song, retrying...");
+            return false;
+        }
+
+        const songs = [];
+        playlist.items.forEach(item => {
+            songs.push({
+                title: item.title,
+                url: item.url,
+                provider: "youtube"
+            })
+        })
+            
+        return songs;
+    }
+
+    getPlaylistFromYTKeywords = async (message, keywords) => {
+        let video;
+        try {
+            video = await this.findSongByKeywords(keywords);
+        } catch (e) {
+            message.channel.send("There was an error getting details about the song, retrying...");
+            return false;
+        }
+        if (video) {
+            return [{
+                title: video.title,
+                url: video.url,
+                provider: "youtube"
+            }];
+        } else {
+            message.channel.send("Error finding video.");
+            return false;
+        }
+    }
 
     findSongByKeywords = async (song) => {
         const video_finder = async(query) => {

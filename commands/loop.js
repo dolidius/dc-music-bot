@@ -6,9 +6,9 @@ export default class Loop {
 
         if (args[0] === "queue") {
             this.toggleLoopQueue(queue, message);
+        } else {
+            this.toggleLoop(queue, message);
         }
-
-        this.toggleLoop(queue, message);
 
     }
 
