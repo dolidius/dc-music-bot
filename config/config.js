@@ -40,5 +40,13 @@ export default {
             name: "random",
             handler: commands.RandomCommand
         },
+        {
+            name: "ooo",
+            handler: commands.OOOCommand
+        },
+        {
+            name: "help",
+            handler: commands.HelpCommand
+        },
     ]
 }

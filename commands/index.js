@@ -7,6 +7,8 @@ import Clear from './clear';
 import Leave from './leave';
 import Loop from './loop'
 import Random from './random';
+import OOO from './ooo';
+import Help from './help';
 
 export default {
     TestCommand: new Test(),
@@ -18,4 +20,6 @@ export default {
     LeaveCommand: new Leave(),
     LoopCommand: new Loop(),
     RandomCommand: new Random(),
+    OOOCommand: new OOO(),
+    HelpCommand: new Help(), 
 }
