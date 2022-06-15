@@ -17,6 +17,8 @@ export default class GlobalState {
             text_channel,
             connection: null,
             loop: false,
+            loopQueue: false,
+            random: false,
             songs,
         };
         this.queue.set(guildId, queue_constructor);

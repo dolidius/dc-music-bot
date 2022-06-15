@@ -47,6 +47,10 @@ export default class Play {
                 message.channel.send("There was an error connecting!");
                 throw err;
             }
+        } else {
+            const queue = state.getCurrentUserQueue(guildId);
+            queue.songs.push(...songs);
+            return message.channel.send(`👍 **${songs[0].title}** added to queue!`);
         }
     }
 
