@@ -19,6 +19,12 @@ export default class Play {
             newSong = await this.getPlaylistFromYTKeywords(message, song);
         }
 
+        if (!newSong) {
+            message.channel.send("There was an error getting details about the song, retrying...");
+            execute(message, args);
+            return;
+        }
+
         songs.push(...newSong);
 
         const guildId = message.guild.id;
@@ -56,7 +62,6 @@ export default class Play {
         try {
             song_info = await ytdl.getInfo(link);
         } catch (e) {
-            message.channel.send("There was an error getting details about the song, retrying...");
             return false;
         }
             
@@ -72,7 +77,6 @@ export default class Play {
         try {
             playlist = await ytpl(link);
         } catch (e) {
-            message.channel.send("There was an error getting details about the song, retrying...");
             return false;
         }
 
@@ -93,7 +97,6 @@ export default class Play {
         try {
             video = await this.findSongByKeywords(keywords);
         } catch (e) {
-            message.channel.send("There was an error getting details about the song, retrying...");
             return false;
         }
         if (video) {

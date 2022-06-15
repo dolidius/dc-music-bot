@@ -10,7 +10,9 @@ export default class ShowQueue {
 
         let queueMessage = "```\n";
 
-        for (let i = 0; i < queue.songs.length; i++) {
+        const iterator = queue.songs.length > 10 ? 10 : queue.songs.length;
+
+        for (let i = 0; i < iterator; i++) {
             queueMessage += `${i + 1}. ${queue.songs[i].title} \n`
         }
 
