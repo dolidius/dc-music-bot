@@ -19,8 +19,6 @@ export default class Play {
             newSong = await this.getPlaylistFromYTKeywords(message, song);
         }
 
-        console.log(newSong);
-
         if (newSong[0].url === "https://www.youtube.com/watch?v=KFuXKEJMgs4" || newSong[0].url === "https://youtube.com/watch?v=KFuXKEJMgs4") {
             message.channel.send("Sorry, I dont play shitty songs");
             return;

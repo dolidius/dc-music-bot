@@ -15,13 +15,14 @@ export default class MusicPlayer {
 
         switch (songToPlay.provider) {
             case "youtube":
-                stream = ytdl(songToPlay.url, { highWaterMark: 1<<25 }, {type: 'opus'});
+                stream = ytdl(songToPlay.url, { filter: "audioonly" });
                 break;
         }
 
         queue.connection
             .play(stream, { seek: 0, volume: 0.5 })
             .on("finish", () => {
+                console.log("FINISHED");
                 manageQueue(queue);
                 MusicPlayer.playSong(guild, state);
             })
@@ -39,7 +40,7 @@ export default class MusicPlayer {
 
             if (queue.random && !queue.loop) {
                 const next = getRandom(1, queue.songs.length);
-                const nextSong = squeue.songs.splice(next - 1, 1);
+                const nextSong = queue.songs.splice(next - 1, 1);
                 queue.songs.unshift(...nextSong);
             }
         }
