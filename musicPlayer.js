@@ -15,7 +15,7 @@ export default class MusicPlayer {
 
         switch (songToPlay.provider) {
             case "youtube":
-                stream = ytdl(songToPlay.url, { filter: "audioonly" });
+                stream = ytdl(songToPlay.url, { highWaterMark: 1<<25 }, {type: 'opus'});
                 break;
         }
 
