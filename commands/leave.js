@@ -6,5 +6,6 @@ export default class Leave {
         const queue = state.getCurrentUserQueue(message.guild.id);
         queue.voice_channel.leave();
         state.removeCurrentUserFromQueue(message.guild.id)
+        console.log('kappa')
     }
 }
