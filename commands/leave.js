@@ -8,5 +8,6 @@ export default class Leave {
         state.removeCurrentUserFromQueue(message.guild.id)
         console.log('kappa')
         console.log('siema')
+        console.log('keepo');
     }
 }
